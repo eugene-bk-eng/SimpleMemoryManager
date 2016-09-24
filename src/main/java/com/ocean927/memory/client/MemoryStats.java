@@ -5,6 +5,7 @@ package com.ocean927.memory.client;
 
 import com.ocean927.memory.impl.MemoryManagerException;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Interface MemoryStats.
  */
@@ -13,7 +14,7 @@ public interface MemoryStats {
 	/**
 	 * Prints memory page status.
 	 *
-	 * @throws Exception the exception
+	 * @throws MemoryManagerException the memory manager exception
 	 */
 	public void print() throws MemoryManagerException;
 
