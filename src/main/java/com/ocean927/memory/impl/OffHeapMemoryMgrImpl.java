@@ -14,8 +14,8 @@ package com.ocean927.memory.impl;
 
 import java.lang.reflect.Field;
 
-import com.ocean927.memory.utils.Formatter;
 import com.ocean927.memory.utils.ByteUtils;
+import com.ocean927.memory.utils.Formatter;
 
 /**
  * The Class OffHeapMemoryMgrImpl.

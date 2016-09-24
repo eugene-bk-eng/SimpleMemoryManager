@@ -13,9 +13,25 @@ User who forgets to deallocate will cause a memory leak.
 
 ## Code Example
 
-long address=impl.allocate(10000); // allocate 10K bytes
-// do something
-impl.deallocate(address);
+Ex:
+
+// use either of the too.
+MemoryClientInterface impl_offheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.OFF_HEAP);
+MemoryClientInterface impl_onheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.ON_HEAP);
+
+// set up 64MB with 1K page
+impl_offheap.setup(64*1024*1024,1024);
+
+// allocate 10K bytes
+long address=impl_offheap.allocate(10000);
+
+// write/read up to 10K bytes into the block
+impl_offheap.writeIntToByteArray( myIntValue1, address );
+impl_offheap.writeIntToByteArray( myIntValue2, address+4 ); // for ints step by 4.
+
+// when done release memory back to the pool
+impl_offheap.deallocate(address);
+
 
 ## Motivation
 

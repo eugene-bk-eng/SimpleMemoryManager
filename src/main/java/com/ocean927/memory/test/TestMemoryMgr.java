@@ -3,6 +3,8 @@
  */
 package com.ocean927.memory.test;
 
+import java.io.IOException;
+
 /**
  * Class is used to for testing of buddy memory manager.
  * https://en.wikipedia.org/wiki/Buddy_memory_allocation
@@ -19,15 +21,11 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import com.ocean927.memory.client.MemoryClientInterface;
 import com.ocean927.memory.impl.AlgoImplEnum;
 import com.ocean927.memory.impl.MemoryManagerException;
 import com.ocean927.memory.impl.MemoryMgrFactory;
 import com.ocean927.memory.impl.OffHeapMemoryMgrImpl;
-import com.ocean927.memory.impl.OnHeapMemoryMgrImpl;
 import com.ocean927.memory.utils.ByteUtils;
 import com.ocean927.memory.utils.Formatter;
 import com.ocean927.memory.utils.Mean;

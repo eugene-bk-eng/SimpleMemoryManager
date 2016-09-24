@@ -34,9 +34,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.ocean927.memory.client.MemoryClientInterface;
-import com.ocean927.memory.test.TestMemoryMgr;
-import com.ocean927.memory.utils.Formatter;
 import com.ocean927.memory.utils.ByteUtils;
+import com.ocean927.memory.utils.Formatter;
 
 
 /**
