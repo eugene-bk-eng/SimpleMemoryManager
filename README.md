@@ -26,7 +26,7 @@ MemoryClientInterface impl_onheap=MemoryMgrFactory.getImplementation(AlgoImplEnu
 
 // set up 64MB with 1K page
 impl_offheap.setup(64*1024*1024,1024);
-// another notation: impl_offheap.setup("64 kb", "1 kb");
+// another notation: impl_offheap.setup("64 mb", "1 kb");
 
 // allocate 10K bytes
 long address=impl_offheap.allocate(10000);
