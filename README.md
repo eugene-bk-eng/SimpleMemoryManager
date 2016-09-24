@@ -3,6 +3,11 @@
 This is an implementation of a memory manager based on buddy memory algorithm. 
 https://en.wikipedia.org/wiki/Buddy_memory_allocation 
 
+Modified buddy algorithm is used in Linux Kernel 
+and few commercial products. It is not as advanced as Java GC 
+collector and requires manual deallocation.
+https://www.kernel.org/doc/gorman/html/understand/understand009.html
+
 Package provides two concrete implementations; 
 an on-heap algorithm backed by byte array and off JVM heap. 
 
@@ -83,6 +88,11 @@ See Test class
 ## Contributors
 
 Single contributor. 
+
+## Feedback
+
+As a single author, I would appreciate user feedback and suggestions. 
+Please reply to github email on file.
 
 ## License
 

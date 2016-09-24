@@ -484,6 +484,9 @@ public abstract class AbstractMemoryManagerAlgorithm implements MemoryClientInte
 	/** The pages per block. */
 	protected int pagesPerBlock[];
 	
+	/** Header length of block in bytes. */
+	protected final static int HEADER_LENGTH=1; 
+	
 	/** The Constant powerOf2. */
 	protected final static int powerOf2[]=new int[31];
 	

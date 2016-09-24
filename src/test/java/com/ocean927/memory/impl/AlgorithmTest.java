@@ -19,7 +19,7 @@ import com.ocean927.memory.client.MemoryClientInterface;
 import com.ocean927.memory.utils.ByteUtils;
 import com.ocean927.memory.utils.Formatter;
 
-public class MemoryManagerAlgoTest {
+public class AlgorithmTest {
 	
 	private final Logger logger = Logger.getLogger(AbstractMemoryManagerAlgorithm.class);
 	private MemoryClientInterface impl=null;
@@ -59,57 +59,6 @@ public class MemoryManagerAlgoTest {
 			impl.print();
 			logger.info("Requests: " + Formatter.fl(cntSuccessfulAllocations) + ", Max Request: " + Formatter.fl(maxAllocationRequest) + " bytes.");
 			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * This test asserts data quality by 
-	 * repeatedly writing and reading back random data.  
-	 */
-	@Test
-	public void testFunctional() {
-		try {
-			//
-			impl.setup("64 kb", "1 kb");
-						
-			// data blocks			
-			Random rnd=new Random();
-			long n=10;
-			for (int trial = 1; trial <= n; trial++) {
-				Map<Long,Byte[]> mapWritten=new HashMap<>();
-				int failureAttempts=0;
-				while(failureAttempts<10) {			
-					int requestingBlock=rnd.nextInt((int)impl.getMemoryAllocated())+1;
-					long addressOfBlock=impl.allocate(requestingBlock);
-					// write
-					if( addressOfBlock>=0) { 
-						// create random block
-						Byte b[]=new Byte[requestingBlock];
-						for (int i = 0; i < b.length; i++) { b[i]=(byte)rnd.nextInt(); }
-						mapWritten.put(addressOfBlock, b);
-						// write it in
-						for (int i = 0; i < b.length; i++) { 
-							impl.writeByteToByteArray(b[i], addressOfBlock+i);
-						}						
-					}else{
-						failureAttempts++;
-					}
-				}
-				// read back
-				logger.info("Testing mapWritten.keySet():=" + mapWritten.keySet().size() );
-				for (Long address:mapWritten.keySet()) {					
-					Byte b[]=(Byte[]) mapWritten.get(address);
-					logger.info("array.len:=" +  b.length );
-					for (int i = 0; i < b.length; i++) {
-						byte expected=b[i];
-						byte actual=impl.readByteFromByteArray(address+i);
-						assertEquals(expected, actual);
-					}
-				}
-				//
-			}			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

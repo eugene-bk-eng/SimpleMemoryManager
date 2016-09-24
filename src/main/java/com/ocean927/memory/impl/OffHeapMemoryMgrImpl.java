@@ -159,7 +159,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public void writeLongToByteArray(long value, long offset) throws MemoryManagerException {
-		unsafe.putLong(memoryOffHeapAddres+offset, value);
+		unsafe.putLong(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
 	}
 	
 	/* (non-Javadoc)
@@ -168,7 +168,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public void writeIntToByteArray(int value, long offset) throws MemoryManagerException {
-		unsafe.putInt(memoryOffHeapAddres+offset, value);
+		unsafe.putInt(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
 	}
 	
 	/* (non-Javadoc)
@@ -177,7 +177,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public long readLongFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getLong(memoryOffHeapAddres+offset);
+		return unsafe.getLong(memoryOffHeapAddres+offset+HEADER_LENGTH);
 	}
 	
 	/* (non-Javadoc)
@@ -186,7 +186,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public int readIntFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getInt(memoryOffHeapAddres+offset);
+		return unsafe.getInt(memoryOffHeapAddres+offset+HEADER_LENGTH);
 	}
 	
 	/* (non-Javadoc)
@@ -195,7 +195,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public void writeDoubleToByteArray(double value, long offset) throws MemoryManagerException {
-		unsafe.putDouble(memoryOffHeapAddres+offset, value);
+		unsafe.putDouble(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
 	}
 
 	/* (non-Javadoc)
@@ -204,7 +204,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public void writeByteToByteArray(byte value, long offset) throws MemoryManagerException {
-		unsafe.putByte(memoryOffHeapAddres+offset, value);
+		unsafe.putByte(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
 	}
 
 	/* (non-Javadoc)
@@ -213,7 +213,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public double readDoubleFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getDouble(memoryOffHeapAddres+offset);
+		return unsafe.getDouble(memoryOffHeapAddres+offset+HEADER_LENGTH);
 	}
 
 	
@@ -223,7 +223,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public byte readByteFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getByte(memoryOffHeapAddres+offset);
+		return unsafe.getByte(memoryOffHeapAddres+offset+HEADER_LENGTH);
 	}
 	
 	/* (non-Javadoc)
@@ -232,7 +232,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public void writeCharToByteArray(char value, long offset) throws MemoryManagerException {
-		unsafe.putChar(memoryOffHeapAddres+offset, value);
+		unsafe.putChar(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
 	}
 	
 	/* (non-Javadoc)
@@ -241,30 +241,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	public char  readCharFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getChar(memoryOffHeapAddres+offset);
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.ocean927.memory.client.MemoryReadWrite#copyMemory(long, long, long)
-	 */
-	@SuppressWarnings(value = { "restriction" })
-	public void copyMemory(long srcPos, long destPos, long length) throws MemoryManagerException {
-		unsafe.copyMemory(memoryOffHeapAddres+srcPos, memoryOffHeapAddres+destPos, length);
-	}
-	
-	/**
-	 *  find out if unsafe supports memory copy call from internal source to dst 
-	 *  using 16 bytes offset to step into first element. checked empirically. 
-	 *
-	 * @param src the src
-	 * @param srcPos the src pos
-	 * @param destPos the dest pos
-	 * @param length the length
-	 * @throws MemoryManagerException the memory manager exception
-	 */
-	@SuppressWarnings("restriction")
-	public void copyMemory(byte src[], long srcPos, long destPos, long length) throws MemoryManagerException {
-		unsafe.copyMemory(src, srcPos+16+srcPos, null, memoryOffHeapAddres+destPos, length);
+		return unsafe.getChar(memoryOffHeapAddres+offset+HEADER_LENGTH);
 	}
 	
 	/** The helper array. */

@@ -15,7 +15,6 @@ import java.io.IOException;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -26,7 +25,6 @@ import com.ocean927.memory.impl.AlgoImplEnum;
 import com.ocean927.memory.impl.MemoryManagerException;
 import com.ocean927.memory.impl.MemoryMgrFactory;
 import com.ocean927.memory.impl.OffHeapMemoryMgrImpl;
-import com.ocean927.memory.utils.ByteUtils;
 import com.ocean927.memory.utils.Formatter;
 import com.ocean927.memory.utils.Mean;
 import com.ocean927.memory.utils.Profiler;
@@ -45,13 +43,6 @@ public class TestMemoryMgr {
 	 * @throws Exception the exception
 	 */
 	public void test() throws MemoryManagerException {
-		
-		int t=1<<0;
-		logger.info("t:=" + t);
-		
-		t=640; 
-		byte b[]=ByteUtils.intToByteArray(t);
-		logger.info("t:=" + t + ", b:=" + Arrays.toString(b));
 
 		// CHOOSE MEMORY MANAGER IMPLEMENTATION
 		//impl=MemoryMgrFactory.getImplementation(AlgoImplEnum.OFF_HEAP);
@@ -72,7 +63,6 @@ public class TestMemoryMgr {
 	 *
 	 * @throws Exception the exception
 	 */
-	@SuppressWarnings(value = { "unused" })
 	public void test_simple_methods() throws MemoryManagerException {
 		logger.info(SysUtils.getClassName() + "." + SysUtils.getMethodName() + ", BEG"); long l_beg=System.currentTimeMillis();
 		
@@ -110,7 +100,6 @@ public class TestMemoryMgr {
 	 *
 	 * @throws Exception the exception
 	 */
-	@SuppressWarnings(value = { "unused" })
 	public void test_defragmentation_block() throws MemoryManagerException {
 		logger.info(SysUtils.getClassName() + "." + SysUtils.getMethodName() + ", BEG"); long l_beg=System.currentTimeMillis();		
 		
@@ -118,7 +107,7 @@ public class TestMemoryMgr {
 		impl.setup(64*1024l,1024);	
 		
 		// BEGIN TEST
-		List<Long> listUsed=new ArrayList(); 
+		List<Long> listUsed=new ArrayList<>(); 
 		{
 			int request=12000; long address=impl.allocate(request); if(address>=0) {logger.info("successful allocation, requesting: " + request + " b, address: " + address); }else{logger.info("un-successful allocation, request: " + request); }
 			if( address>=0 ) { listUsed.add(address); }

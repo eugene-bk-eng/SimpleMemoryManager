@@ -122,7 +122,7 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@Override
 	public void writeLongToByteArray(long value, long offset) throws MemoryManagerException {
-		ByteUtils.writeLongToByteArray2(value, memory, (int)offset);
+		ByteUtils.writeLongToByteArray2(value, memory, (int)offset +HEADER_LENGTH);
 	}
 
 	/* (non-Javadoc)
@@ -130,7 +130,7 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@Override
 	public void writeIntToByteArray(int value, long offset) throws MemoryManagerException {
-		ByteUtils.writeIntToByteArray(value, memory, (int)offset);
+		ByteUtils.writeIntToByteArray(value, memory, (int)offset +HEADER_LENGTH);
 	}
 	
 	/**
@@ -144,7 +144,7 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@Override
 	public long readLongFromByteArray(long offset) throws MemoryManagerException {
-		return ByteUtils.readLongFromByteArray(memory, (int)offset);
+		return ByteUtils.readLongFromByteArray(memory, (int)offset+HEADER_LENGTH);
 	}
 	
 	/* (non-Javadoc)
@@ -152,7 +152,7 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@Override
 	public int readIntFromByteArray(long offset) throws MemoryManagerException {
-		return ByteUtils.readIntFromByteArray(memory, (int)offset);
+		return ByteUtils.readIntFromByteArray(memory, (int)offset+HEADER_LENGTH);
 	}	
 
 	/* (non-Javadoc)
@@ -160,7 +160,7 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@Override
 	public void writeDoubleToByteArray(double value, long offset) throws MemoryManagerException {
-		ByteBuffer buf=ByteBuffer.wrap(memory, (int)offset, 8); 
+		ByteBuffer buf=ByteBuffer.wrap(memory, (int)offset+HEADER_LENGTH, 8); 
 		buf.putDouble(value);
 	}
 	
@@ -170,7 +170,7 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@Override
 	public double readDoubleFromByteArray(long offset) throws MemoryManagerException { 
 		ByteBuffer buf=ByteBuffer.wrap(memory);
-		return buf.getDouble((int)offset); // you're reading from offset
+		return buf.getDouble((int)offset+HEADER_LENGTH); // you're reading from offset
 	}
 
 	/* (non-Javadoc)
@@ -178,7 +178,7 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@Override
 	public void writeByteToByteArray(byte value, long offset) throws MemoryManagerException {
-		memory[(int)offset]=value;
+		memory[(int)offset+HEADER_LENGTH]=value;
 	}
 
 	/* (non-Javadoc)
@@ -186,7 +186,7 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@Override
 	public byte readByteFromByteArray(long offset) throws MemoryManagerException {
-		return memory[(int)offset];
+		return memory[(int)offset+HEADER_LENGTH];
 	}
 	
 	/* (non-Javadoc)
@@ -194,7 +194,7 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@Override
 	public void writeCharToByteArray(char value, long offset) throws MemoryManagerException {
-		ByteBuffer buf=ByteBuffer.wrap(memory, (int)offset, 2); 
+		ByteBuffer buf=ByteBuffer.wrap(memory, (int)offset+HEADER_LENGTH, 2); 
 		buf.putChar(value);
 	}
 	
@@ -204,22 +204,8 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@Override
 	public char  readCharFromByteArray(long offset) throws MemoryManagerException {
 		ByteBuffer buf=ByteBuffer.wrap(memory);
-		return buf.getChar((int)offset); // you're reading from offset
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.ocean927.memory.client.MemoryReadWrite#copyMemory(long, long, long)
-	 */
-	public void copyMemory(long srcPos, long destPos, long length) throws MemoryManagerException {
-		System.arraycopy(memory, (int)srcPos, memory, (int)destPos, (int)length);
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.ocean927.memory.client.MemoryReadWrite#copyMemory(byte[], long, long, long)
-	 */
-	private void copyMemory(byte src[], long srcPos, long destPos, long length) throws MemoryManagerException {
-		System.arraycopy(src, (int)srcPos, memory, (int)destPos, (int)length);
-	}
+		return buf.getChar((int)offset+HEADER_LENGTH); // you're reading from offset
+	}	
 	
 	/** The memory. */
 	private byte memory[];
