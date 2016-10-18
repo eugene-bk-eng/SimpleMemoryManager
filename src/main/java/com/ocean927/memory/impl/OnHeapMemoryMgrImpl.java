@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import com.ocean927.memory.utils.ByteUtils;
 import com.ocean927.memory.utils.Formatter;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class OnHeapMemoryMgrImpl.
  */
@@ -104,6 +105,8 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 
 	/**
 	 * In this implementation, sets the underlining array reference to null. 
+	 *
+	 * @throws MemoryManagerException the memory manager exception
 	 * @see com.ocean927.memory.impl.AbstractMemoryManagerAlgorithm#freeMemory()
 	 */
 	@Override
@@ -112,55 +115,57 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	}
 	
 	/**
-	 *  LIMITATION OF JAVA ON-HEAP SOLUTION THAT WE USE BYTE ARRAY WHICH 
+	 * LIMITATION OF JAVA ON-HEAP SOLUTION THAT WE USE BYTE ARRAY WHICH 
 	 * CAN ONLY GO TO 2^31-1 OR ABOUT 1.99GB. LAST BIT IS A SIGN. 
 	 * OFFSET MUST BE WITHIN A NON-NEGATIVE INTEGER RANGE AS SPECIFIED
 	 *
 	 * @param value the value
-	 * @param offset the offset
+	 * @param start the start
+	 * @param index the index
 	 * @throws MemoryManagerException the memory manager exception
 	 */
 	@Override
-	public void writeLongToByteArray(long value, long offset) throws MemoryManagerException {
-		ByteUtils.writeLongToByteArray2(value, memory, (int)offset +HEADER_LENGTH);
+	public void writeLongToByteArray(long value, long start, long index) throws MemoryManagerException {
+		ByteUtils.writeLongToByteArray2(value, memory,(int)start + (int)index +HEADER_LENGTH);
 	}
 
 	/* (non-Javadoc)
 	 * @see com.ocean927.memory.client.MemoryReadWrite#writeIntToByteArray(int, long)
 	 */
 	@Override
-	public void writeIntToByteArray(int value, long offset) throws MemoryManagerException {
-		ByteUtils.writeIntToByteArray(value, memory, (int)offset +HEADER_LENGTH);
+	public void writeIntToByteArray(int value, long start, long index) throws MemoryManagerException {
+		ByteUtils.writeIntToByteArray(value, memory,(int)start + (int)index +HEADER_LENGTH);
 	}
 	
 	/**
 	 *  LIMITATION OF JAVA ON-HEAP SOLUTION THAT WE USE BYTE ARRAY WHICH 
-	 * CAN ONLY GO TO 2^31-1 OR ABOUT 1.99GB. LAST BIT IS A SIGN. 
+	 * CAN ONLY GO TO 2^31-1 OR ABOUT 1.99GB space (2^31*8bytes). LAST BIT IS A SIGN. 
 	 * OFFSET MUST BE WITHIN A NON-NEGATIVE INTEGER RANGE AS SPECIFIED
 	 *
-	 * @param offset the offset
+	 * @param start the start
+	 * @param index the index
 	 * @return the long
 	 * @throws MemoryManagerException the memory manager exception
 	 */
 	@Override
-	public long readLongFromByteArray(long offset) throws MemoryManagerException {
-		return ByteUtils.readLongFromByteArray(memory, (int)offset+HEADER_LENGTH);
+	public long readLongFromByteArray(long start, long index) throws MemoryManagerException {
+		return ByteUtils.readLongFromByteArray(memory, (int)start + (int)index+HEADER_LENGTH);
 	}
 	
 	/* (non-Javadoc)
 	 * @see com.ocean927.memory.client.MemoryReadWrite#readIntFromByteArray(long)
 	 */
 	@Override
-	public int readIntFromByteArray(long offset) throws MemoryManagerException {
-		return ByteUtils.readIntFromByteArray(memory, (int)offset+HEADER_LENGTH);
+	public int readIntFromByteArray(long start, long index) throws MemoryManagerException {
+		return ByteUtils.readIntFromByteArray(memory, (int)start + (int)index+HEADER_LENGTH);
 	}	
 
 	/* (non-Javadoc)
 	 * @see com.ocean927.memory.client.MemoryReadWrite#writeDoubleToByteArray(double, long)
 	 */
 	@Override
-	public void writeDoubleToByteArray(double value, long offset) throws MemoryManagerException {
-		ByteBuffer buf=ByteBuffer.wrap(memory, (int)offset+HEADER_LENGTH, 8); 
+	public void writeDoubleToByteArray(double value, long start, long index) throws MemoryManagerException {
+		ByteBuffer buf=ByteBuffer.wrap(memory, (int)start + (int)index+HEADER_LENGTH, 8); 
 		buf.putDouble(value);
 	}
 	
@@ -168,33 +173,33 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 * @see com.ocean927.memory.client.MemoryReadWrite#readDoubleFromByteArray(long)
 	 */
 	@Override
-	public double readDoubleFromByteArray(long offset) throws MemoryManagerException { 
+	public double readDoubleFromByteArray(long start, long index) throws MemoryManagerException { 
 		ByteBuffer buf=ByteBuffer.wrap(memory);
-		return buf.getDouble((int)offset+HEADER_LENGTH); // you're reading from offset
+		return buf.getDouble((int)start + (int)index+HEADER_LENGTH); // you're reading from offset
 	}
 
 	/* (non-Javadoc)
 	 * @see com.ocean927.memory.client.MemoryReadWrite#writeByteToByteArray(byte, long)
 	 */
 	@Override
-	public void writeByteToByteArray(byte value, long offset) throws MemoryManagerException {
-		memory[(int)offset+HEADER_LENGTH]=value;
+	public void writeByteToByteArray(byte value, long start, long index) throws MemoryManagerException {
+		memory[(int)start + (int)index+HEADER_LENGTH]=value;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.ocean927.memory.client.MemoryReadWrite#readByteFromByteArray(long)
 	 */
 	@Override
-	public byte readByteFromByteArray(long offset) throws MemoryManagerException {
-		return memory[(int)offset+HEADER_LENGTH];
+	public byte readByteFromByteArray(long start, long index) throws MemoryManagerException {
+		return memory[(int)start + (int)index+HEADER_LENGTH];
 	}
 	
 	/* (non-Javadoc)
 	 * @see com.ocean927.memory.client.MemoryReadWrite#writeCharToByteArray(char, long)
 	 */
 	@Override
-	public void writeCharToByteArray(char value, long offset) throws MemoryManagerException {
-		ByteBuffer buf=ByteBuffer.wrap(memory, (int)offset+HEADER_LENGTH, 2); 
+	public void writeCharToByteArray(char value, long start, long index) throws MemoryManagerException {
+		ByteBuffer buf=ByteBuffer.wrap(memory, (int)start + (int)index + HEADER_LENGTH, 2); 
 		buf.putChar(value);
 	}
 	
@@ -202,9 +207,9 @@ public class OnHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 * @see com.ocean927.memory.client.MemoryReadWrite#readCharFromByteArray(long)
 	 */
 	@Override
-	public char  readCharFromByteArray(long offset) throws MemoryManagerException {
+	public char  readCharFromByteArray(long start, long index) throws MemoryManagerException {
 		ByteBuffer buf=ByteBuffer.wrap(memory);
-		return buf.getChar((int)offset+HEADER_LENGTH); // you're reading from offset
+		return buf.getChar((int)start + (int)index + HEADER_LENGTH); // you're reading from offset
 	}	
 	
 	/** The memory. */

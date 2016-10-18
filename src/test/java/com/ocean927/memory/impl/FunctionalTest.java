@@ -2,7 +2,6 @@ package com.ocean927.memory.impl;
 
 import static org.junit.Assert.assertEquals;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -13,11 +12,17 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import com.ocean927.memory.client.MemoryClientInterface;
 
+//@RunWith(value = Parameterized.class)
 public class FunctionalTest {
 	private final Logger logger = Logger.getLogger(AbstractMemoryManagerAlgorithm.class);
+	
 	private MemoryClientInterface impl_on_heap=null;
 	private MemoryClientInterface impl_off_heap=null;
 	
@@ -27,12 +32,8 @@ public class FunctionalTest {
 	@Test
 	public void testFunctional_OnHeap() {
 		try {
-			
-			//impl_on_heap.setup(8*1024*1024, 1024);
-			impl_on_heap.setup("16 kb", "1 kb");
-			
-			testFunctional(impl_on_heap);
-			
+			impl_on_heap.setup("16 kb", "1 kb");			
+			testFunctional(impl_on_heap);			
 		} catch (MemoryManagerException e) { e.printStackTrace(); }								
 	}
 	
@@ -41,13 +42,9 @@ public class FunctionalTest {
 	 */
 	@Test
 	public void testFunctional_OffHeap() {
-		try {
-			
-			impl_off_heap.setup(64*1024*1024, 1024);
-			//impl_off_heap.setup("64 kb", "1 kb");
-			
-			testFunctional(impl_off_heap);
-			
+		try {			
+			impl_off_heap.setup("64 kb", "1 kb");			
+			testFunctional(impl_off_heap);			
 		} catch (MemoryManagerException e) { e.printStackTrace(); }								
 	}
 		
@@ -76,7 +73,7 @@ public class FunctionalTest {
 						mapWritten.put(addressOfBlock, b);
 						// write it in
 						for (int i = 0; i < b.length; i++) { 
-							impl.writeByteToByteArray(b[i], addressOfBlock+i);
+							impl.writeByteToByteArray(b[i], addressOfBlock, i);
 							//failureAttempts=11;break;
 						}						
 					}else{
@@ -93,7 +90,7 @@ public class FunctionalTest {
 					logger.info("Reading back data, addressOfBlock:=" + addressOfBlock + ", array.len:=" +  b.length );
 					for (int i = 0; i < b.length; i++) {
 						byte expected=b[i];
-						byte actual=impl.readByteFromByteArray(addressOfBlock+i*1);
+						byte actual=impl.readByteFromByteArray(addressOfBlock, i*1);
 						assertEquals("Failed comparison at index#:=" + i, expected, actual);
 					}
 				}
@@ -122,17 +119,10 @@ public class FunctionalTest {
 	
 	@After
 	public void after() {
-		// CHOOSE MEMORY MANAGER IMPLEMENTATION 
 		try {
-			if(impl_on_heap!=null) {
-				impl_on_heap.freeMemory();
-			}
-			if(impl_off_heap!=null) {
-				impl_off_heap.freeMemory();
-			}
-		} catch (MemoryManagerException e) {
-			e.printStackTrace();
-		}		
+			if(impl_off_heap!=null ) { impl_off_heap.freeMemory(); }
+			if(impl_on_heap!=null ) { impl_on_heap.freeMemory(); }
+		} catch (MemoryManagerException e) { e.printStackTrace(); }		
 	}
 	
 	@BeforeClass

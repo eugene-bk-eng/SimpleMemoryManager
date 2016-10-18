@@ -18,6 +18,7 @@ import static org.junit.Assert.*;
 import com.ocean927.memory.client.MemoryClientInterface;
 import com.ocean927.memory.utils.ByteUtils;
 import com.ocean927.memory.utils.Formatter;
+import com.ocean927.memory.utils.UnsafeAccess;
 
 public class AlgorithmTest {
 	
@@ -111,6 +112,7 @@ public class AlgorithmTest {
 		// CHOOSE MEMORY MANAGER IMPLEMENTATION 
 		try {
 			impl=MemoryMgrFactory.getImplementation(AlgoImplEnum.ON_HEAP);
+			//impl=MemoryMgrFactory.getImplementation(AlgoImplEnum.OFF_HEAP);
 		} catch (MemoryManagerException e) {
 			e.printStackTrace();
 		}

@@ -34,6 +34,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.ocean927.memory.client.MemoryClientInterface;
+import com.ocean927.memory.client.OffHeapInterface;
 import com.ocean927.memory.utils.ByteUtils;
 import com.ocean927.memory.utils.Formatter;
 
@@ -361,7 +362,9 @@ public abstract class AbstractMemoryManagerAlgorithm implements MemoryClientInte
 	 */
 	public void print() throws MemoryManagerException {				
 		// REPORT ON MEMORY
-		logger.info("MEMORY LAYOUT: " + Formatter.fl(N) + " bytes in " + getMaxPages() + " pages of " + pageSize + " bytes/page.");
+		if( this instanceof OnHeapMemoryMgrImpl) { logger.info("MODE: ON-HEAP."); }
+		else if( this instanceof OffHeapMemoryMgrImpl) { logger.info("MODE: OFF-JVM-HEAP, ADDRESS: " + ((OffHeapInterface)this).getMemoryOffHeapAddress() ); } 		
+		logger.info("MEMORY LAYOUT: " + Formatter.fl(N) + " bytes in " + getMaxPages() + " pages of " + pageSize + " bytes/page.");		
 		
 		// SCAN EACH INDIVIDUAL BLOCK
 		long addressOfBlock=0; int cnt=0;
@@ -485,7 +488,7 @@ public abstract class AbstractMemoryManagerAlgorithm implements MemoryClientInte
 	protected int pagesPerBlock[];
 	
 	/** Header length of block in bytes. */
-	protected final static int HEADER_LENGTH=1; 
+	public final static int HEADER_LENGTH=1; 
 	
 	/** The Constant powerOf2. */
 	protected final static int powerOf2[]=new int[31];

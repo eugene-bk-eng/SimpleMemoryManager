@@ -12,15 +12,16 @@
 
 package com.ocean927.memory.impl;
 
-import java.lang.reflect.Field;
-
+import com.ocean927.memory.client.OffHeapInterface;
 import com.ocean927.memory.utils.ByteUtils;
 import com.ocean927.memory.utils.Formatter;
+import com.ocean927.memory.utils.UnsafeAccess;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class OffHeapMemoryMgrImpl.
  */
-public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
+public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm implements OffHeapInterface {
 	
 	/**
 	 * Instantiates a new off heap memory mgr impl.
@@ -28,7 +29,6 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 * @throws MemoryManagerException the memory manager exception
 	 */
 	public OffHeapMemoryMgrImpl() throws MemoryManagerException{	
-		unsafe=getUnsafe();		
 	}
 	
 	/* (non-Javadoc)
@@ -41,7 +41,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 		N=memorySizeBytes;
 		logger.info(ByteUtils.getClassName() + "." + ByteUtils.getMethodName() + ": " + memorySizeBytes + " bytes, " + Formatter.rDbl((double)memorySizeBytes/(1024*1024), 2) + " MB., " + Formatter.rDbl((double)memorySizeBytes/(1024*1024*1024), 2) + " GB.");
 		if( memoryOffHeapAddres>=0 ) { throw new MemoryManagerException("Memory address must be free before allocating " + memoryOffHeapAddres); }
-		memoryOffHeapAddres=unsafe.allocateMemory(N); 	
+		memoryOffHeapAddres=UnsafeAccess.UNSAFE.allocateMemory(N); 	
 		if( ByteUtils.ispowerof2long(N)==false ) {
 		 throw new MemoryManagerException("Memory size " + N + " must be power of 2" );
 		}
@@ -79,7 +79,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	protected void setBlockHeaderUsed(long addressOfFreeBlock, long pagesInBlock) throws MemoryManagerException {
 		int logof2=ByteUtils.log2_v2(pagesInBlock);		
 		// my_byte = my_byte | (1 << pos); // sets the bit. set 1
-		unsafe.putByte(memoryOffHeapAddres + addressOfFreeBlock,  (byte) ((logof2<<1) | (1)) );
+		UnsafeAccess.UNSAFE.putByte(memoryOffHeapAddres + addressOfFreeBlock,  (byte) ((logof2<<1) | (1)) );
 			
 	}
 	
@@ -91,7 +91,7 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	protected void setBlockHeaderFree(long addressOfFreeBlock, long pagesInBlock) throws MemoryManagerException {
 		int logof2=ByteUtils.log2_v2(pagesInBlock);		
 		// my_byte = my_byte & ~(1 << pos); // clear the bit. set 0.
-		unsafe.putByte(memoryOffHeapAddres + addressOfFreeBlock, (byte) ((logof2<<1) & (-2)) );		
+		UnsafeAccess.UNSAFE.putByte(memoryOffHeapAddres + addressOfFreeBlock, (byte) ((logof2<<1) & (-2)) );		
 	}
 	
 	/* (non-Javadoc)
@@ -100,12 +100,12 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	protected boolean isUsed(long addressOfFreeBlock) {
-		//return (unsafe.getByte(memoryOffHeapAddres + addressOfFreeBlock) & (1<<0))==1 ? true: false;
-		if( unsafe.getByte(memoryOffHeapAddres + addressOfFreeBlock)==(byte)1 ) {
-			return true;
-		}else{
-			return false;
-		}
+		return (UnsafeAccess.UNSAFE.getByte(memoryOffHeapAddres + addressOfFreeBlock) & (1<<0))==1 ? true: false;
+//		if( UnsafeAccess.UNSAFE.getByte(memoryOffHeapAddres + addressOfFreeBlock)==(byte)1 ) {
+//			return true;
+//		}else{
+//			return false;
+//		}
 	}	
 	
 	/* (non-Javadoc)
@@ -114,12 +114,12 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override
 	protected boolean isFree(long addressOfFreeBlock) {
-		//return (unsafe.getByte(memoryOffHeapAddres + addressOfFreeBlock) & (1<<0))==0 ? true: false;
-		if( unsafe.getByte(memoryOffHeapAddres + addressOfFreeBlock)==(byte)0 ) {
-			return true;
-		}else{
-			return false;
-		}
+		return (UnsafeAccess.UNSAFE.getByte(memoryOffHeapAddres + addressOfFreeBlock) & (1<<0))==0 ? true: false;
+//		if( UnsafeAccess.UNSAFE.getByte(memoryOffHeapAddres + addressOfFreeBlock)==(byte)0 ) {
+//			return true;
+//		}else{
+//			return false;
+//		}
 	}	
 	
 	/**
@@ -131,26 +131,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings(value = { "restriction" })
 	@Override	
 	public int getPagesInThisBlock(long addressOfFreeBlock) {
-		int power=(int)unsafe.getByte(memoryOffHeapAddres + addressOfFreeBlock)>>1;
+		int power=(int)UnsafeAccess.UNSAFE.getByte(memoryOffHeapAddres + addressOfFreeBlock)>>1;
 		return powerOf2[power];
-	}
-		
-	/**
-	 * Gets the unsafe.
-	 *
-	 * @return the unsafe
-	 * @throws MemoryManagerException the memory manager exception
-	 */
-	@SuppressWarnings(value = { "restriction" })
-	public static sun.misc.Unsafe getUnsafe() throws MemoryManagerException {
-	  try {	
-		Field f = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
-		f.setAccessible(true);
-		sun.misc.Unsafe unsafe = (sun.misc.Unsafe) f.get(null);
-		return unsafe;
-	  }catch(Exception e) {
-		  throw new MemoryManagerException(e);
-	  }
 	}
 	
 	/* (non-Javadoc)
@@ -158,8 +140,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public void writeLongToByteArray(long value, long offset) throws MemoryManagerException {
-		unsafe.putLong(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
+	public void writeLongToByteArray(long value, long start, long index) throws MemoryManagerException {
+		UnsafeAccess.UNSAFE.putLong(memoryOffHeapAddres+start+index+HEADER_LENGTH, value);
 	}
 	
 	/* (non-Javadoc)
@@ -167,8 +149,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public void writeIntToByteArray(int value, long offset) throws MemoryManagerException {
-		unsafe.putInt(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
+	public void writeIntToByteArray(int value, long start, long index) throws MemoryManagerException {
+		UnsafeAccess.UNSAFE.putInt(memoryOffHeapAddres+start+index+HEADER_LENGTH, value);
 	}
 	
 	/* (non-Javadoc)
@@ -176,8 +158,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public long readLongFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getLong(memoryOffHeapAddres+offset+HEADER_LENGTH);
+	public long readLongFromByteArray(long start, long index) throws MemoryManagerException {
+		return UnsafeAccess.UNSAFE.getLong(memoryOffHeapAddres+start+index+HEADER_LENGTH);
 	}
 	
 	/* (non-Javadoc)
@@ -185,8 +167,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public int readIntFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getInt(memoryOffHeapAddres+offset+HEADER_LENGTH);
+	public int readIntFromByteArray(long start, long index) throws MemoryManagerException {		
+		return UnsafeAccess.UNSAFE.getInt(memoryOffHeapAddres+start+index+HEADER_LENGTH);
 	}
 	
 	/* (non-Javadoc)
@@ -194,8 +176,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public void writeDoubleToByteArray(double value, long offset) throws MemoryManagerException {
-		unsafe.putDouble(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
+	public void writeDoubleToByteArray(double value, long start, long index) throws MemoryManagerException {
+		UnsafeAccess.UNSAFE.putDouble(memoryOffHeapAddres+start+index+HEADER_LENGTH, value);
 	}
 
 	/* (non-Javadoc)
@@ -203,8 +185,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public void writeByteToByteArray(byte value, long offset) throws MemoryManagerException {
-		unsafe.putByte(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
+	public void writeByteToByteArray(byte value, long start, long index) throws MemoryManagerException {
+		UnsafeAccess.UNSAFE.putByte(memoryOffHeapAddres+start+index+HEADER_LENGTH, value);
 	}
 
 	/* (non-Javadoc)
@@ -212,8 +194,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public double readDoubleFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getDouble(memoryOffHeapAddres+offset+HEADER_LENGTH);
+	public double readDoubleFromByteArray(long start, long index) throws MemoryManagerException {
+		return UnsafeAccess.UNSAFE.getDouble(memoryOffHeapAddres+start+index+HEADER_LENGTH);
 	}
 
 	
@@ -222,8 +204,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public byte readByteFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getByte(memoryOffHeapAddres+offset+HEADER_LENGTH);
+	public byte readByteFromByteArray(long start, long index) throws MemoryManagerException {
+		return UnsafeAccess.UNSAFE.getByte(memoryOffHeapAddres+start+index+HEADER_LENGTH);
 	}
 	
 	/* (non-Javadoc)
@@ -231,8 +213,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public void writeCharToByteArray(char value, long offset) throws MemoryManagerException {
-		unsafe.putChar(memoryOffHeapAddres+offset+HEADER_LENGTH, value);
+	public void writeCharToByteArray(char value, long start, long index) throws MemoryManagerException {
+		UnsafeAccess.UNSAFE.putChar(memoryOffHeapAddres+start+index+HEADER_LENGTH, value);
 	}
 	
 	/* (non-Javadoc)
@@ -240,8 +222,8 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	 */
 	@SuppressWarnings(value = { "restriction" })
 	@Override
-	public char  readCharFromByteArray(long offset) throws MemoryManagerException {
-		return unsafe.getChar(memoryOffHeapAddres+offset+HEADER_LENGTH);
+	public char  readCharFromByteArray(long start, long index) throws MemoryManagerException {
+		return UnsafeAccess.UNSAFE.getChar(memoryOffHeapAddres+start+index+HEADER_LENGTH);
 	}
 	
 	/** The helper array. */
@@ -257,13 +239,13 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@SuppressWarnings("restriction")
 	public long getAddressOfObject(sun.misc.Unsafe unsafe, Object obj) {		
 		helperArray[0] 			= obj;
-		long baseOffset 		= unsafe.arrayBaseOffset(Object[].class);
-		long addressOfObject	= unsafe.getLong(helperArray, baseOffset);		
+		long baseOffset 		= UnsafeAccess.UNSAFE.arrayBaseOffset(Object[].class);
+		long addressOfObject	= UnsafeAccess.UNSAFE.getLong(helperArray, baseOffset);		
 		return addressOfObject;
 	}
 	
 	/**
-	 * In this implementation, calls into unsafe.freeMemory() to tell OS 
+	 * In this implementation, calls into UnsafeAccess.UNSAFE.freeMemory() to tell OS 
 	 * to release memory.
 	 * 
 	 * @see com.ocean927.memory.impl.AbstractMemoryManagerAlgorithm#freeMemory()
@@ -272,15 +254,18 @@ public class OffHeapMemoryMgrImpl extends AbstractMemoryManagerAlgorithm {
 	@Override
 	public void freeMemory() {
 		if( memoryOffHeapAddres>=0 ) {
-			unsafe.freeMemory(memoryOffHeapAddres);
+			UnsafeAccess.UNSAFE.freeMemory(memoryOffHeapAddres);
 			memoryOffHeapAddres=-1;
 		}
 	}
 	
-	/** The memory off heap addres. */
-	private long memoryOffHeapAddres=-1;
+	/* (non-Javadoc)
+	 * @see com.ocean927.memory.client.OffHeapInterface#getMemoryOffHeapAddress()
+	 */
+	public long getMemoryOffHeapAddress() {
+		return memoryOffHeapAddres;
+	}
 	
-	/** The unsafe. */
-	@SuppressWarnings(value = { "restriction" })
-	private sun.misc.Unsafe unsafe;	
+	/** The memory off heap addres. */
+	private long memoryOffHeapAddres=-1;	
 }
