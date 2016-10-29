@@ -4,12 +4,13 @@ This is an implementation of a memory manager based on buddy memory algorithm.
 https://en.wikipedia.org/wiki/Buddy_memory_allocation 
 
 Modified buddy algorithm is used in Linux Kernel 
-and few commercial products. It is not as advanced as Java GC 
-collector and requires manual deallocation.
+and few commercial products. It is not an advanced collector 
+and requires manual deallocation.
+
 https://www.kernel.org/doc/gorman/html/understand/understand009.html
 
-Package provides two concrete implementations; 
-an on-heap algorithm backed by byte array and off JVM heap. 
+Package provides two implementations; 
+an on-heap algorithm backed by byte[] and off JVM heap. 
 
 Deallocation is explicit. Memory defragmentation is invoked manually. There is 
 no daemon thread to combine freed memory blocks. 
@@ -17,43 +18,40 @@ no daemon thread to combine freed memory blocks.
 User who forgets to deallocate will cause a memory leak.   
 
 ## Code Example
-
-
 ```
-		//
-		logger.info("Starting test");
-		// use either of two algorithms
-		MemoryClientInterface impl_offheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.OFF_HEAP);
-		//MemoryClientInterface impl_onheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.ON_HEAP);
-		// set up 64MB with 1K page
-		impl_offheap.setup(64*1024*1024,1024);
-		// another notation: impl_offheap.setup("64 kb", "1 kb");
+//
+logger.info("Starting test");
+// use either of two algorithms
+MemoryClientInterface impl_offheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.OFF_HEAP);
+//MemoryClientInterface impl_onheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.ON_HEAP);
+// set up 64MB with 1K page
+impl_offheap.setup(64*1024*1024,1024);
+// another notation: impl_offheap.setup("64 kb", "1 kb");
 
-		// allocate 10K bytes
-		long address=impl_offheap.allocate(10000);
+// allocate 10K bytes
+long address=impl_offheap.allocate(10000);
 
-		printSeparator();
-		// write integer values into address space [0...10000-1]
-		int myIntWriting1=7;
-		int myIntWriting2=-500;		
-		impl_offheap.writeIntToByteArray( myIntWriting1, address, 0 );
-		impl_offheap.writeIntToByteArray( myIntWriting2, address, 4 ); // for ints step by 4.
-		
+printSeparator();
+// write integer values into address space [0...10000-1]
+int myIntWriting1=7;
+int myIntWriting2=-500;		
+impl_offheap.writeIntToByteArray( myIntWriting1, address, 0 );
+impl_offheap.writeIntToByteArray( myIntWriting2, address, 4 ); // for ints step by 4.
 
-		// read back
-		int myIntRead1=impl_offheap.readIntFromByteArray( address, 0 );
-		int myIntRead2=impl_offheap.readIntFromByteArray( address, 4 );
-		
 
-		printSeparator();
-		// when done release memory back to the pool
-		impl_offheap.deallocate(address);
+// read back
+int myIntRead1=impl_offheap.readIntFromByteArray( address, 0 );
+int myIntRead2=impl_offheap.readIntFromByteArray( address, 4 );
 
-		printSeparator();
-		// show memory usage
-		impl_offheap.print();
+
+printSeparator();
+// when done release memory back to the pool
+impl_offheap.deallocate(address);
+
+printSeparator();
+// show memory usage
+impl_offheap.print();
 ```
-
 
 ## Motivation
 
@@ -64,8 +62,6 @@ Project is born to support
   off heap and avoiding jvm array checks.
 
 ## Package Limitations and Future Enhancements
-
-This project is a prototype. 
 
 - Concurrent access to memory manager is not supported. Results 
 will be unpredictable. 
@@ -85,15 +81,17 @@ Solution: none.
 
 ## Installation
 
-See Test class
+Execute mvn command then go into /bin
+
+mvn clean compile assembly:single
 
 ## API Reference
 
-See /docs
+See folder /docs
 
 ## Tests
 
-See Test class
+See package /examples
 
 ## Contributors
 
