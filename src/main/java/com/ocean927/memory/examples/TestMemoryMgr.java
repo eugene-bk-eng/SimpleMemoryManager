@@ -1,7 +1,7 @@
  /*
  * 
  */
-package com.ocean927.memory.test;
+package com.ocean927.memory.examples;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -33,13 +33,20 @@ import com.ocean927.memory.utils.Mean;
 import com.ocean927.memory.utils.Profiler;
 import com.ocean927.memory.utils.SysUtils;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class TestMemoryMgr.
  */
 public class TestMemoryMgr {
 	
+	/** The logger. */
 	private final Logger logger = Logger.getLogger(TestMemoryMgr.class);
 	
+	/**
+	 * Instantiates a new test memory mgr.
+	 *
+	 * @throws MemoryManagerException the memory manager exception
+	 */
 	public TestMemoryMgr() throws MemoryManagerException {
 		// for testing.
 		unsafe = getUnsafe();
@@ -47,7 +54,9 @@ public class TestMemoryMgr {
 
 	/**
 	 * Test.
-	 * @throws Exception the exception
+	 *
+	 * @throws MemoryManagerException the memory manager exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public void test() throws MemoryManagerException, IOException {
 
@@ -72,7 +81,7 @@ public class TestMemoryMgr {
 	/**
 	 *  method: simple sequence of allocate and deallocate methods.
 	 *
-	 * @throws Exception the exception
+	 * @throws MemoryManagerException the memory manager exception
 	 */
 	public void test_simple_methods() throws MemoryManagerException {
 		logger.info(SysUtils.getClassName() + "." + SysUtils.getMethodName() + ", BEG"); long l_beg=System.currentTimeMillis();
@@ -111,7 +120,7 @@ public class TestMemoryMgr {
 	 *  method: shows that defragmentation without moving used memory blocks
 	 *  can't always solve allocation challenge.
 	 *
-	 * @throws Exception the exception
+	 * @throws MemoryManagerException the memory manager exception
 	 */
 	public void test_defragmentation_block() throws MemoryManagerException {
 		logger.info(SysUtils.getClassName() + "." + SysUtils.getMethodName() + ", BEG"); long l_beg=System.currentTimeMillis();		
@@ -153,7 +162,7 @@ public class TestMemoryMgr {
 	/**
 	 *  method: a random combination of calls followed by free the memory and defragmentation.
 	 *
-	 * @throws Exception the exception
+	 * @throws MemoryManagerException the memory manager exception
 	 */
 	public void test_random_combination_of_alloca_malloc() throws MemoryManagerException {
 		logger.info(SysUtils.getClassName() + "." + SysUtils.getMethodName() + ", BEG"); long l_beg=System.currentTimeMillis();
@@ -207,9 +216,9 @@ public class TestMemoryMgr {
 	 * because the tests calculates statistics accumulating values
 	 * and accumulates memory allocations in the list.
 	 * N should be roughly 10M.
-	 * @throws IOException 
 	 *
-	 * @throws Exception the exception
+	 * @throws MemoryManagerException the memory manager exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	@SuppressWarnings(value = { "unused" })
 	public void test_allocation_performance() throws MemoryManagerException, IOException {
@@ -299,8 +308,7 @@ public class TestMemoryMgr {
 	 *
 	 * @param w the w
 	 * @param label the label
-	 * @param out the out
-	 * @throws Exception the exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public void printStatsTable(ResultWrapper w, String label) throws IOException {
 		logger.info( (Formatter.padInFront("LABEL", 10, " ") + "," + Formatter.padInFront("N", 10, " ") + "," + Formatter.padInFront("MEDIAN", 10, " ") + "," + Formatter.padInFront("MEAN", 10, " ") + "," + Formatter.padInFront("STDEV(nano)", 10, " ") + "," + Formatter.padInFront("MIN(nano)", 10, " ") + "," + Formatter.padInFront("MAX(nano)", 10, " ")));
@@ -314,8 +322,11 @@ public class TestMemoryMgr {
 					  Formatter.padInFront("" + Formatter.dbl(w.max), 10, " ")) );		
 	}
 	
-	/** shows off heap space can be used between JVMs 
-	 * @throws MemoryManagerException */
+	/**
+	 *  shows off heap space can be used between JVMs .
+	 *
+	 * @throws MemoryManagerException the memory manager exception
+	 */
 	void testUnsafeWriter() throws MemoryManagerException {
 		//
 		logger.info(SysUtils.getClassName() + "." + SysUtils.getMethodName() + ", BEG"); long l_beg=System.currentTimeMillis();
@@ -346,8 +357,11 @@ public class TestMemoryMgr {
 		logger.info(SysUtils.getClassName() + "." + SysUtils.getMethodName() + ", END, elapsed " + Formatter.getDiff(System.currentTimeMillis(),l_beg)); 
 	}
 	
-	/** INCORRECT: shows off heap space can be used between JVMs 
-	 * @throws MemoryManagerException */
+	/**
+	 *  INCORRECT: shows off heap space can be used between JVMs .
+	 *
+	 * @throws MemoryManagerException the memory manager exception
+	 */
 	void testUnsafeReader() throws MemoryManagerException {
 		//
 		logger.info(SysUtils.getClassName() + "." + SysUtils.getMethodName() + ", BEG"); long l_beg=System.currentTimeMillis();
@@ -370,11 +384,29 @@ public class TestMemoryMgr {
 		logger.info(SysUtils.getClassName() + "." + SysUtils.getMethodName() + ", END, elapsed " + Formatter.getDiff(System.currentTimeMillis(),l_beg)); 
 	}
 	
+	/**
+	 * Read int from byte array.
+	 *
+	 * @param memoryOffHeapAddres the memory off heap addres
+	 * @param start the start
+	 * @param index the index
+	 * @return the int
+	 * @throws MemoryManagerException the memory manager exception
+	 */
 	@SuppressWarnings("restriction")
 	public int readIntFromByteArray(long memoryOffHeapAddres, long start, long index) throws MemoryManagerException {		
 		return unsafe.getInt(memoryOffHeapAddres+start+index+AbstractMemoryManagerAlgorithm.HEADER_LENGTH);
 	}
 	
+	/**
+	 * Read byte from byte array.
+	 *
+	 * @param memoryOffHeapAddres the memory off heap addres
+	 * @param start the start
+	 * @param index the index
+	 * @return the byte
+	 * @throws MemoryManagerException the memory manager exception
+	 */
 	@SuppressWarnings("restriction")
 	public byte readByteFromByteArray(long memoryOffHeapAddres, long start, long index) throws MemoryManagerException {		
 		return unsafe.getByte(memoryOffHeapAddres+start+index+AbstractMemoryManagerAlgorithm.HEADER_LENGTH);
@@ -398,37 +430,53 @@ public class TestMemoryMgr {
 	  }
 	}
 	
+	/**
+	 * Read console.
+	 *
+	 * @return the string[]
+	 */
 	String[] readConsole() {
-		Scanner console = new Scanner(System.in);
-        String str=console.nextLine();
-        String args[]=str.split("\\s+");
+		String args[]=null;
+			Scanner console = new Scanner(System.in); 
+			try {
+		        String str=console.nextLine();
+		        args=str.split("\\s+");
+			}finally{ console.close(); }
         return args;
 	}
 	
-	String readConsoleString() {
+	/**
+	 * Read console string.
+	 *
+	 * @return the string
+	 */
+	String readConsoleString() {		
 		Scanner console = new Scanner(System.in);
-        String str=console.nextLine();                              
-        return str;
+		try {	
+	        return console.nextLine();                              
+		}finally{ console.close(); }
 	}
 	
 	/**
 	 * The main method.
 	 *
 	 * @param args the arguments
-	 * @throws Exception 
+	 * @throws Exception the exception
 	 */
 	public static void main(String args[]) throws Exception {
 		 (new TestMemoryMgr()).test();	
 	}
 
-	/** Random generator */
+	/**  Random generator. */
 	private Random rnd=new Random();
 	
+	/** The unsafe. */
+	@SuppressWarnings("restriction")
 	private sun.misc.Unsafe unsafe;	
 	
-	/** Reference to implementation thru interface */
+	/**  Reference to implementation thru interface. */
 	private MemoryClientInterface impl;
 	
-	/** Profiler */
+	/**  Profiler. */
 	private Profiler p=new Profiler();
 }
