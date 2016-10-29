@@ -39,11 +39,13 @@ import com.ocean927.memory.utils.ByteUtils;
 import com.ocean927.memory.utils.Formatter;
 
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class AbstractMemoryManagerAlgorithm.
  */
 public abstract class AbstractMemoryManagerAlgorithm implements MemoryClientInterface {
 	
+	/** The logger. */
 	final Logger logger = Logger.getLogger(AbstractMemoryManagerAlgorithm.class);
 	/* (non-Javadoc)
 	 * @see com.ocean927.memory.client.MemoryManagement#setup(java.lang.String)

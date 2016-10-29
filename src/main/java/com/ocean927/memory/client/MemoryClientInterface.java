@@ -9,6 +9,9 @@
  */
 package com.ocean927.memory.client;
 
+/**
+ * The Interface MemoryClientInterface.
+ */
 public interface MemoryClientInterface extends MemoryManagement, MemoryStats, MemoryReadWrite {
 
 }

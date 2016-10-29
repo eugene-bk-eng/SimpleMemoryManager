@@ -4,6 +4,10 @@
 package com.ocean927.memory.impl;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MemoryManagerException.
+ */
 public class MemoryManagerException extends Exception {
 
 	/**

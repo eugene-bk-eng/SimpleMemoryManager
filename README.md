@@ -20,30 +20,38 @@ User who forgets to deallocate will cause a memory leak.
 
 
 ```
-// use either of two algorithms
-MemoryClientInterface impl_offheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.OFF_HEAP);
-MemoryClientInterface impl_onheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.ON_HEAP);
+		//
+		logger.info("Starting test");
+		// use either of two algorithms
+		MemoryClientInterface impl_offheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.OFF_HEAP);
+		//MemoryClientInterface impl_onheap=MemoryMgrFactory.getImplementation(AlgoImplEnum.ON_HEAP);
+		// set up 64MB with 1K page
+		impl_offheap.setup(64*1024*1024,1024);
+		// another notation: impl_offheap.setup("64 kb", "1 kb");
 
-// set up 64MB with 1K page
-impl_offheap.setup(64*1024*1024,1024);
-// another notation: impl_offheap.setup("64 mb", "1 kb");
+		// allocate 10K bytes
+		long address=impl_offheap.allocate(10000);
 
-// allocate 10K bytes
-long address=impl_offheap.allocate(10000);
+		printSeparator();
+		// write integer values into address space [0...10000-1]
+		int myIntWriting1=7;
+		int myIntWriting2=-500;		
+		impl_offheap.writeIntToByteArray( myIntWriting1, address, 0 );
+		impl_offheap.writeIntToByteArray( myIntWriting2, address, 4 ); // for ints step by 4.
+		
 
-// write integer values into address space [0...10000-1]
-impl_offheap.writeIntToByteArray( 1, address );
-impl_offheap.writeIntToByteArray( 7, address+4 ); // for ints step by 4.
+		// read back
+		int myIntRead1=impl_offheap.readIntFromByteArray( address, 0 );
+		int myIntRead2=impl_offheap.readIntFromByteArray( address, 4 );
+		
 
-// read back
-int myIntValue1=impl_offheap.readIntFromByteArray( address+0 );
-int myIntValue2=impl_offheap.readIntFromByteArray( address+4 ); 
+		printSeparator();
+		// when done release memory back to the pool
+		impl_offheap.deallocate(address);
 
-// when done release memory back to the pool
-impl_offheap.deallocate(address);
-
-// show memory usage
-impl_offheap.print();
+		printSeparator();
+		// show memory usage
+		impl_offheap.print();
 ```
 
 

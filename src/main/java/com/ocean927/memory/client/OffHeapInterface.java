@@ -3,6 +3,10 @@
  */
 package com.ocean927.memory.client;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Interface OffHeapInterface.
+ */
 public interface OffHeapInterface {
 
 	/**

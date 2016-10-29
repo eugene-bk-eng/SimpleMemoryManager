@@ -25,7 +25,6 @@ public class UnsafeAccess
 {
     
     /** The unsafe. */
-    @SuppressWarnings("restriction")
 	public static Unsafe UNSAFE;
     
     /**
@@ -62,7 +61,6 @@ public class UnsafeAccess
 	 * @return the unsafe
 	 * @throws MemoryManagerException the memory manager exception
 	 */
-	@SuppressWarnings(value = { "restriction" })
 	public static sun.misc.Unsafe getUnsafe() throws MemoryManagerException {
 	  try {	
 		if( UNSAFE==null ) {

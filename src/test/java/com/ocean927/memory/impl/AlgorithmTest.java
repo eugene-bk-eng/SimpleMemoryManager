@@ -1,24 +1,19 @@
 package com.ocean927.memory.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import com.ocean927.memory.client.MemoryClientInterface;
 import com.ocean927.memory.utils.ByteUtils;
 import com.ocean927.memory.utils.Formatter;
-import com.ocean927.memory.utils.UnsafeAccess;
 
 public class AlgorithmTest {
 	
