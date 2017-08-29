@@ -1,0 +1,67 @@
+
+public class PrinterUtil {
+	
+	//private final static Logger logger = LogManager.getLogger(PrinterUtil.class);
+		
+	public static List<PortfolioStat> getDailyPNL(TreeMap<LocalDate,PortfolioSnapshot> portfolioDailySnapshots, IAnalytics analyticsMgr) throws KException, IOException, ExecutionException {
+		List<PortfolioStat> list=new ArrayList<>();
+			
+			int cnt=0;			
+			for (Entry<LocalDate,PortfolioSnapshot> entry: portfolioDailySnapshots.entrySet() ) {				
+				LocalDate date=entry.getKey();
+				PortfolioSnapshot snap=entry.getValue();
+				List<Inst> listInst=PortfolioCalculator.getInstruments(snap);
+				Map<Inst,Double> mapPx=new HashMap<>();
+				for (Inst sy: listInst) {
+					TradeBar bar=analyticsMgr.getTradeBar(date, sy);
+					if( bar!=null ) {						
+						mapPx.put(sy, Double.parseDouble(bar.getAdjClose()) );
+					}else{
+						// TODO: if price is not available on that day while 
+						// holding a position, how do we evaluate a position market value?
+						mapPx.put(sy, 0d );
+					}				
+				}				
+				//
+				PortfolioStat dp=PortfolioCalculator.calculateStatsOnPortfolio(snap, mapPx);
+				if( cnt>0 ) {
+					PortfolioCalculator.calculateReturn(list.get(cnt-1), dp);
+				}else{
+					dp.dailyReturn=BigDecimal.ZERO;
+				}
+				list.add(dp);
+				cnt++;
+			}				
+		return list;
+	}	
+	
+	// http://www.investopedia.com/ask/answers/06/geometricmean.asp
+	public static BigDecimal calculateGeometricAverage(List<BigDecimal> list) {
+		BigDecimal monthlyReturn=BigDecimal.ZERO; 
+		int cnt=0;
+		if( list.size()>0 ) {
+			// multiply through 
+			for (BigDecimal r: list) {
+				cnt++;
+				if( cnt==1 ) {
+					// assign first 
+					monthlyReturn=r.add(BigDecimal.ONE);
+				}else{
+					// accumulate
+					monthlyReturn=monthlyReturn.multiply(r.add(BigDecimal.ONE));
+				}
+			}
+			// TODO: find a function that can pow small numbers
+			double d=Math.pow(monthlyReturn.doubleValue(), (double)1/list.size());
+			if( !Double.isNaN(d) ) {
+				monthlyReturn = new BigDecimal( d );
+				monthlyReturn = monthlyReturn.subtract(BigDecimal.ONE);
+			}else{
+				monthlyReturn = BigDecimal.ZERO;
+			}
+		}
+		return monthlyReturn;
+	}
+	
+
+}
