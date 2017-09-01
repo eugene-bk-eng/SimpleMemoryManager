@@ -1,0 +1,183 @@
+public class OMSTracker {
+	
+	private final Map<LocalDate,DailyStat> map;
+
+	public OMSTracker() {
+		map=new HashMap<>();
+	}
+	
+	public void process(Instant instant, BaseMsg message) {		
+		
+		DailyStat dailyStat=getOrCreate(UtilsDateTime.toLocalDate(instant));
+		
+		SymbolStat syStat=dailyStat.getOrCreate(message.getInstrument());
+		
+		switch(message.getMsgType()) {
+			case ORDER:	
+				syStat.cntOrders++;
+				break;
+			case CANCEL:	
+				syStat.cntCancels++;
+				break;
+			case REPORT:
+				ReportMsg report=(ReportMsg) message;
+				switch( report.getOrdStatus() ) {
+					case NEW: syStat.cntAcks++; break;
+					case PARTIALLY_FILLED: syStat.cntPartialFills++; break;
+					case FILLED: syStat.cntFullFills++; break;
+					case DONE_FOR_DAY: syStat.cntDoneForDay++; break;
+					default:
+						throw new UnsupportedOperationException("Not implemented yet: "+ report.getOrdStatus());
+				}
+				break;
+			default:
+				throw new UnsupportedOperationException("Not implemented yet: "+ message.getMsgType());
+		}
+	}
+	
+	DailyStat getOrCreate(LocalDate date) {
+		if( map.containsKey(date) ) {
+			return map.get(date);
+		}else{
+			DailyStat stat=new DailyStat();
+			map.put(date, stat);
+			return stat;
+		}
+	}
+	
+	public static class DailyStat {
+		public final Map<Inst,SymbolStat> map;
+		public DailyStat() {
+			map=new HashMap<>();
+		}
+		
+		SymbolStat getOrCreate(Inst instrument) {
+			if( map.containsKey(instrument) ) {
+				return map.get(instrument);
+			}else{
+				SymbolStat stat=new SymbolStat();
+				map.put(instrument, stat);
+				return stat;
+			}
+		}
+	}
+	
+	public static class SymbolStat {
+		int cntOrders;
+		int cntCancels;
+		
+		int cntAcks;
+		int cntPartialFills;
+		int cntFullFills;
+		int cntDoneForDay;
+	}
+	
+	public List<String> printShortSummary() {
+		List<String> list=new ArrayList<>();
+		
+			StringBuilder sb=new StringBuilder();
+			sb.setLength(0);
+			
+			// HEADER
+			sb.append(FrameworkUtils.padInBack("DAYS", 6));
+			sb.append(FrameworkUtils.padInBack("SYMBOLS", 10));
+			sb.append(FrameworkUtils.padInBack("ORDERS", 8));
+			sb.append(FrameworkUtils.padInBack("CANCELS", 8));
+			sb.append(FrameworkUtils.padInBack("ACKS", 8));
+			sb.append(FrameworkUtils.padInBack("PARTFL", 8));
+			sb.append(FrameworkUtils.padInBack("FILL", 8));
+			sb.append(FrameworkUtils.padInBack("DONEDAY", 8));
+			list.add(sb.toString()); sb.setLength(0);
+			
+			int days=0, orders=0, cancels=0, acks=0, partfills=0, fullfill=0, doneforday=0;
+			HashSet<String> setSymbols=new HashSet<>();
+			for (Map.Entry<LocalDate, DailyStat> e1: map.entrySet()) {
+				days++;
+				DailyStat dailyStat=e1.getValue();
+				for (Map.Entry<Inst, SymbolStat> e2: dailyStat.map.entrySet()) {
+					setSymbols.add(e2.getKey().toString());
+					SymbolStat symbolStat=e2.getValue();
+					orders+=symbolStat.cntOrders;
+					cancels+=symbolStat.cntCancels;
+					
+					acks+=symbolStat.cntAcks;
+					partfills+=symbolStat.cntPartialFills;
+					fullfill+=symbolStat.cntFullFills;
+					doneforday+=symbolStat.cntDoneForDay;
+				}
+			}
+			
+			sb.append(FrameworkUtils.padInBack(days, 6));
+			sb.append(FrameworkUtils.padInBack(setSymbols.size(), 10));
+			sb.append(FrameworkUtils.padInBack(orders, 8));
+			sb.append(FrameworkUtils.padInBack(cancels, 8));
+			sb.append(FrameworkUtils.padInBack(acks, 8));
+			sb.append(FrameworkUtils.padInBack(partfills, 8));
+			sb.append(FrameworkUtils.padInBack(fullfill, 8));
+			sb.append(FrameworkUtils.padInBack(doneforday, 8));
+			list.add(sb.toString()); sb.setLength(0);
+		
+		return list;
+	}
+	
+	public List<String> printSummaryPerInstrument() {
+		List<String> list=new ArrayList<>();
+		
+			StringBuilder sb=new StringBuilder();
+			list.add(sb.toString()); sb.setLength(0);
+			
+			// HEADER
+			sb.append(FrameworkUtils.padInBack("DAYS", 6));
+			sb.append(FrameworkUtils.padInBack("SYMBOL", 10));
+			sb.append(FrameworkUtils.padInBack("ORDERS", 8));
+			sb.append(FrameworkUtils.padInBack("CANCELS", 8));
+			sb.append(FrameworkUtils.padInBack("ACKS", 8));
+			sb.append(FrameworkUtils.padInBack("PARTFL", 8));
+			sb.append(FrameworkUtils.padInBack("FILL", 8));
+			sb.append(FrameworkUtils.padInBack("DONEDAY", 8));
+			list.add(sb.toString()); sb.setLength(0);
+			
+			Map<Inst,SymbolStat> mapSymbolStat=new HashMap<>(); 
+			for (Map.Entry<LocalDate, DailyStat> e1: map.entrySet()) {
+				DailyStat dailyStat=e1.getValue();
+				for (Map.Entry<Inst, SymbolStat> e2: dailyStat.map.entrySet()) {
+					Inst instrument=e2.getKey();
+					SymbolStat symbolStat=e2.getValue();
+					
+					SymbolStat globalStat;
+					if( mapSymbolStat.containsKey(instrument) ) {
+						globalStat=mapSymbolStat.get(instrument);
+					}else{
+						globalStat=new SymbolStat();
+						mapSymbolStat.put(instrument, globalStat);						
+					}
+					
+					globalStat.cntOrders+=symbolStat.cntOrders;
+					globalStat.cntCancels+=symbolStat.cntCancels;
+					
+					globalStat.cntAcks+=symbolStat.cntAcks;
+					globalStat.cntPartialFills+=symbolStat.cntPartialFills;
+					globalStat.cntFullFills+=symbolStat.cntFullFills;
+					globalStat.cntDoneForDay+=symbolStat.cntDoneForDay;
+				}
+			}	
+			
+			List<Inst> sortedKey=new ArrayList<>(mapSymbolStat.keySet());
+			for (Inst sy: sortedKey) {
+				sb.setLength(0);
+				SymbolStat globalStat=mapSymbolStat.get(sy);
+				sb.append(FrameworkUtils.padInBack("-", 6));
+				sb.append(FrameworkUtils.padInBack(sy.toString(), 10));
+				sb.append(FrameworkUtils.padInBack(globalStat.cntOrders, 8));
+				sb.append(FrameworkUtils.padInBack(globalStat.cntCancels, 8));
+				sb.append(FrameworkUtils.padInBack(globalStat.cntAcks, 8));
+				sb.append(FrameworkUtils.padInBack(globalStat.cntPartialFills, 8));
+				sb.append(FrameworkUtils.padInBack(globalStat.cntFullFills, 8));
+				sb.append(FrameworkUtils.padInBack(globalStat.cntDoneForDay, 8));
+				list.add(sb.toString()); sb.setLength(0);
+			}
+			
+		return list;
+	}
+
+}
